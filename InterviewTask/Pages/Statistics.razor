@@ -1,0 +1,49 @@
+﻿@page "/statistics"
+
+@using InterviewTask.Data.Services
+@inject IStatisticsService IStatisticsService
+
+<h1>Statistics</h1>
+
+@if (statistics == null)
+{
+    <p><em>Loading...</em></p> }
+else
+{
+    @foreach (var league in statistics.Leagues)
+    {
+        <h2>@league.Name</h2>
+        <br />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Best attack team</th>
+                    <th>Best defense team</th>
+                    <th>Best team</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@league.GetBestAttackTeam().Name</td>
+                    <td>@league.GetBestDefenseTeam().Name</td>
+                    <td>@league.GetBestTeam().Name</td>
+                </tr>
+            </tbody>
+        </table>
+        <br />
+    }
+    <p>Best day: @BestDayName - @BestDayGoals goals</p>
+}
+
+@code
+{
+    private IStatisticsService statistics { get; set; }
+    private string BestDayName { get; set; }
+    private int BestDayGoals { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        statistics ??= await StatisticsService.Initialize();
+        (BestDayName, BestDayGoals) = statistics.GetBestDay();
+    }
+}
